@@ -1,36 +1,49 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# arxiv-digest
 
-## Getting Started
+Paste an arXiv URL. Get a stack-shaped digest grounded in a fixed set of projects.
 
-First, run the development server:
+**Live:** [arxiv-digest-hazel.vercel.app](https://arxiv-digest-hazel.vercel.app)
+
+## What it does
+
+Most paper summarizers give you a generic TL;DR. This one is tuned for a single reader and asks a sharper question: _does this paper change what I ship?_
+
+**Input:** an arXiv abs/pdf URL.
+
+**Output:** a typed JSON digest with
+
+- `verdict` — `must-read` | `worth-skimming` | `skip`
+- `tldr` — 2 sentences, no hedging
+- `why_it_matters` — placement in the landscape
+- `connections` — concrete hooks into Keep, Param Hub, TFR, Both And, Build Yourself, Wired Different
+- `steal` — algorithm / UI / framing to lift
+- `skepticism` — the honest counter
+- `questions` — 2–3 open questions
+
+## Stack
+
+- Next.js 15 (App Router) on Vercel
+- Claude Opus 4.7 via `@anthropic-ai/sdk`
+- Ephemeral prompt caching on the stack-context system prompt (cache hit drops cost per digest by ~90% after the first call)
+- arXiv metadata via the abs-page XML feed
+
+## Cost
+
+Opus 4.7 at ~2k output tokens per digest. With cached system prompt:
+
+- First call in a 5-min window: ~$0.03
+- Subsequent calls: ~$0.003
+
+## Why
+
+I read 5–15 arXiv papers a week. The 20% that touch what I'm actually building get buried under the 80% that don't. A digest that is explicitly project-aware turns the reading queue from "interesting ideas" into "decisions I need to make."
+
+## Run locally
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
+pnpm install
+cp .env.example .env.local   # add ANTHROPIC_API_KEY
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Paste any arxiv.org/abs/... URL into the input.
